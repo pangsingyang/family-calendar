@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF1EE;
+    --paper:#FFFFFF;
+    --ink:#223027;
+    --ink-soft:#5B6A61;
+    --line:#DCE3DC;
+    --pine:#33544A;
+    --pine-dark:#213A33;
+    --ember:#E4572E;
+    --ember-soft:#FCE3D9;
+    --radius:10px;
+    --tape-1:#E4572E;
+    --tape-2:#2A9D8F;
+    --tape-3:#E0A93B;
+    --tape-4:#6A5A9E;
+    --tape-5:#3E7EA6;
+    --tape-6:#C15A85;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:28px 20px 80px;
+  }
+  header.top{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:22px;
+    border-bottom:2px solid var(--line);
+    padding-bottom:18px;
+  }
+  header.top h1{
+    font-size:30px;
+    margin:0;
+    color:var(--pine-dark);
+  }
+  header.top .sub{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .view-toggle{
+    display:inline-flex;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:3px;
+    gap:2px;
+  }
+  .view-toggle button{
+    border:none;
+    background:transparent;
+    padding:7px 16px;
+    border-radius:999px;
+    font-family:'Inter';
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:.15s;
+  }
+  .view-toggle button.active{
+    background:var(--pine);
+    color:#fff;
+  }
+  .btn{
+    border:none;
+    border-radius:8px;
+    padding:9px 16px;
+    font-family:'Inter';
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+    transition:.15s;
+  }
+  .btn-primary{
+    background:var(--ember);
+    color:#fff;
+  }
+  .btn-primary:hover{background:#cc4c25;}
+  .btn-ghost{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink);
+  }
+  .btn-ghost:hover{border-color:var(--pine);}
+  .btn-small{
+    padding:5px 10px;
+    font-size:12px;
+    border-radius:6px;
+  }
+  .filters{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:12px 14px;
+    margin-bottom:20px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .filters .label{
+    font-size:12px;
+    color:var(--ink-soft);
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    margin-right:2px;
+  }
+  .chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:5px 12px 5px 8px;
+    border-radius:999px;
+    border:1.5px solid var(--line);
+    background:#fff;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    color:var(--ink-soft);
+    transition:.15s;
+  }
+  .chip .dot{
+    width:9px;height:9px;border-radius:50%;
+    flex-shrink:0;
+  }
+  .chip.on{
+    border-color:transparent;
+    color:#fff;
+  }
+  .chip.reset{
+    color:var(--ink-soft);
+    border-style:dashed;
+  }
+  /* LIST VIEW */
+  .day-group{margin-bottom:26px;}
+  .day-heading{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .day-heading .d-num{
+    font-family:'Fraunces';
+    font-size:22px;
+    font-weight:600;
+    color:var(--pine-dark);
+  }
+  .day-heading .d-rest{
+    font-size:13px;
+    color:var(--ink-soft);
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+  }
+  .event-card{
+    position:relative;
+    display:flex;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 14px 12px 20px;
+    margin-bottom:8px;
+    gap:14px;
+    align-items:center;
+    overflow:hidden;
+  }
+  .event-card::before{
+    content:"";
+    position:absolute;
+    left:0;top:0;bottom:0;
+    width:8px;
+  }
+  .event-time{
+    font-variant-numeric:tabular-nums;
+    font-weight:700;
+    font-size:13px;
+    color:var(--pine-dark);
+    min-width:98px;
+  }
+  .event-time span{
+    display:block;
+    font-weight:400;
+    color:var(--ink-soft);
+    font-size:11px;
+  }
+  .event-main{flex:1; min-width:0;}
+  .event-main .activity{
+    font-weight:700;
+    font-size:15px;
+  }
+  .event-main .addr{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:1px;
+  }
+  .event-people{
+    display:flex;
+    gap:5px;
+    flex-wrap:wrap;
+    max-width:200px;
+    justify-content:flex-end;
+  }
+  .person-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    background:var(--bg);
+    padding:3px 9px;
+    border-radius:999px;
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .person-pill .dot{width:7px;height:7px;border-radius:50%;}
+  .event-actions{
+    display:flex;
+    gap:6px;
+  }
+  .icon-btn{
+    border:none;
+    background:transparent;
+    cursor:pointer;
+    color:var(--ink-soft);
+    padding:4px 6px;
+    border-radius:5px;
+    font-size:13px;
+  }
+  .icon-btn:hover{background:var(--bg); color:var(--ink);}
+  .empty-state{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--ink-soft);
+    background:var(--paper);
+    border:1px dashed var(--line);
+    border-radius:var(--radius);
+  }
+  .empty-state h3{color:var(--pine-dark); margin-bottom:6px;}
+  /* CALENDAR VIEW */
+  .cal-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .cal-nav h2{
+    font-size:20px;
+    margin:0;
+    color:var(--pine-dark);
+  }
+  .cal-nav-btns{display:flex; gap:6px;}
+  .cal-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:6px;
+    min-width:0;
+    width:100%;
+  }
+  .cal-dow{
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--ink-soft);
+    text-align:center;
+    padding-bottom:4px;
+  }
+  .cal-cell{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    min-height:96px;
+    min-width:0;
+    padding:6px;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+    transition:.12s;
+    overflow:hidden;
+  }
+  .cal-cell:hover{border-color:var(--pine);}
+  .cal-cell.other-month{opacity:.35;}
+  .cal-cell.today{
+    border-color:var(--ember);
+    box-shadow:0 0 0 1px var(--ember);
+  }
+  .cal-cell .num{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .cal-ev{
+    font-size:10.5px;
+    background:var(--bg);
+    border-radius:4px;
+    padding:2px 5px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    display:flex;
+    align-items:center;
+    gap:4px;
+    font-weight:600;
+    min-width:0;
+    max-width:100%;
+  }
+  .cal-ev .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .cal-more{
+    font-size:10px;
+    color:var(--ink-soft);
+    padding-left:4px;
+    font-weight:600;
+  }
+  /* DAY PANEL */
+  .day-panel{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+    margin-top:18px;
+  }
+  .day-panel h3{margin:0 0 10px; font-size:17px; color:var(--pine-dark);}
+  /* MODAL */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(34,48,39,0.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:50;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:var(--paper);
+    border-radius:14px;
+    width:100%;
+    max-width:440px;
+    padding:24px;
+    max-height:90vh;
+    overflow-y:auto;
+  }
+  .modal h2{margin:0 0 16px; font-size:20px; color:var(--pine-dark);}
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--ink-soft);
+    margin-bottom:5px;
+  }
+  .field input[type=text],
+  .field input[type=date],
+  .field input[type=time]{
+    width:100%;
+    padding:9px 10px;
+    border:1.5px solid var(--line);
+    border-radius:7px;
+    font-family:'Inter';
+    font-size:14px;
+    color:var(--ink);
+    background:#fff;
+  }
+  .field input:focus{outline:2px solid var(--pine); outline-offset:1px;}
+  .field select{
+    width:100%;
+    padding:9px 10px;
+    border:1.5px solid var(--line);
+    border-radius:7px;
+    font-family:'Inter';
+    font-size:14px;
+    color:var(--ink);
+    background:#fff;
+  }
+  .repeat-detail{display:none;}
+  .repeat-detail.show{display:block;}
+  .weekday-picker{display:flex; gap:6px; flex-wrap:wrap;}
+  .weekday-chip{
+    display:flex; align-items:center; justify-content:center;
+    width:34px; height:34px;
+    border-radius:50%;
+    border:1.5px solid var(--line);
+    font-size:12.5px; font-weight:700;
+    cursor:pointer;
+    color:var(--ink-soft);
+    background:#fff;
+    transition:.12s;
+  }
+  .weekday-chip input{display:none;}
+  .weekday-chip.checked{
+    background:var(--pine);
+    border-color:var(--pine);
+    color:#fff;
+  }
+  .repeat-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:3px;
+    font-size:10px;
+    font-weight:700;
+    color:var(--pine);
+    background:var(--bg);
+    padding:2px 7px;
+    border-radius:999px;
+    margin-left:6px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    vertical-align:middle;
+  }
+  .row2{display:flex; gap:10px;}
+  .row2 .field{flex:1;}
+  .people-check{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .people-check label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    border:1.5px solid var(--line);
+    padding:6px 10px 6px 8px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    text-transform:none;
+    color:var(--ink);
+  }
+  .people-check input{margin:0;}
+  .modal-actions{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:20px;
+    gap:8px;
+  }
+  .modal-actions .right{display:flex; gap:8px;}
+  .manage-people{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    margin-bottom:20px;
+  }
+  .manage-people h3{
+    font-size:14px;
+    margin:0 0 10px;
+    color:var(--pine-dark);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .people-list{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;}
+  .person-edit{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:var(--bg);
+    padding:4px 4px 4px 10px;
+    border-radius:999px;
+    font-size:12.5px;
+    font-weight:600;
+  }
+  .person-edit input[type=color]{
+    width:16px; height:16px; border:none; padding:0; background:none; cursor:pointer;
+  }
+  .add-person-row{display:flex; gap:8px;}
+  .add-person-row input{
+    flex:1;
+    padding:7px 10px;
+    border:1.5px solid var(--line);
+    border-radius:7px;
+    font-family:'Inter';
+    font-size:13px;
+  }
+  .note{font-size:12px; color:var(--ink-soft); margin-top:16px; line-height:1.5;}
+  .export-toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .export-hint{font-size:12.5px; color:var(--ink-soft);}
+  .export-box{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .export-text{
+    width:100%;
+    min-height:400px;
+    border:none;
+    resize:vertical;
+    font-family:'SF Mono','Consolas',monospace;
+    font-size:12.5px;
+    line-height:1.6;
+    color:var(--ink);
+    background:transparent;
+    white-space:pre;
+    overflow-x:auto;
+  }
+  .export-text:focus{outline:none;}
+  @media(max-width:640px){
+    .cal-cell{min-height:64px;}
+    .cal-ev{display:none;}
+    .cal-cell .num{font-size:12px;}
+    .event-people{max-width:120px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Family Planner</h1>
+      <div class="sub">Everyone's plans, one board.</div>
+    </div>
+    <button class="btn btn-primary" id="addEventBtn">+ Add event</button>
+  </header>
+
+  <div class="manage-people">
+    <h3>People <button class="btn btn-ghost btn-small" id="togglePeopleBtn">Manage</button></h3>
+    <div class="people-list" id="peopleList"></div>
+    <div class="add-person-row" id="addPersonRow" style="display:none;">
+      <input type="text" id="newPersonName" placeholder="Add a person, e.g. Grandma">
+      <input type="color" id="newPersonColor" value="#3E7EA6">
+      <button class="btn btn-ghost btn-small" id="addPersonBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="view-toggle">
+      <button id="listBtn" class="active">List</button>
+      <button id="calBtn">Calendar</button>
+      <button id="exportBtn">Export</button>
+    </div>
+  </div>
+
+  <div class="filters" id="filterBar">
+    <span class="label">Show</span>
+  </div>
+
+  <div id="listView"></div>
+  <div id="exportView" style="display:none;">
+    <div class="export-toolbar">
+      <span class="export-hint">Select all &amp; copy, or use the button. Respects the "Show" filter above.</span>
+      <button class="btn btn-primary btn-small" id="copyExportBtn">Copy to clipboard</button>
+    </div>
+    <div class="export-box">
+      <textarea class="export-text" id="exportText" readonly rows="20"></textarea>
+    </div>
+  </div>
+  <div id="calView" style="display:none;">
+    <div class="cal-nav">
+      <div class="cal-nav-btns">
+        <button class="btn btn-ghost btn-small" id="prevMonth">&larr;</button>
+        <button class="btn btn-ghost btn-small" id="todayBtn">Today</button>
+        <button class="btn btn-ghost btn-small" id="nextMonth">&rarr;</button>
+      </div>
+      <h2 id="monthLabel"></h2>
+      <div style="width:120px;"></div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="day-panel" id="dayPanel" style="display:none;"></div>
+  </div>
+
+  <p class="note">Data is stored in this browser only, using localStorage. Once you host this file (e.g. GitHub Pages), each visitor's browser keeps its own copy. In this in-chat preview, storage may reset between reloads. The list view shows repeating events up to a year ahead; the calendar view always shows the full month you're viewing.</p>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2 id="modalTitle">Add event</h2>
+    <input type="hidden" id="editId">
+    <div class="field">
+      <label>Activity</label>
+      <input type="text" id="fActivity" placeholder="Swim class">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="fDate">
+      </div>
+      <div class="field">
+        <label>End date <span style="text-transform:none; font-weight:400;">(optional)</span></label>
+        <input type="date" id="fEndDate">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Start time</label>
+        <input type="time" id="fStart">
+      </div>
+      <div class="field">
+        <label>End time</label>
+        <input type="time" id="fEnd">
+      </div>
+    </div>
+    <div class="field">
+      <label>Repeats</label>
+      <select id="fRepeat">
+        <option value="none">Does not repeat</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+      </select>
+    </div>
+    <div class="field repeat-detail" id="repeatIntervalWrap">
+      <label>Every</label>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <input type="text" inputmode="numeric" id="fInterval" value="1" style="width:70px; padding:9px 10px; border:1.5px solid var(--line); border-radius:7px; font-family:'Inter'; font-size:14px;">
+        <span id="repeatUnitLabel" style="font-size:13px; color:var(--ink-soft); font-weight:600;">week(s)</span>
+      </div>
+    </div>
+    <div class="field repeat-detail" id="weeklyDaysWrap">
+      <label>Repeats on</label>
+      <div class="weekday-picker" id="weekdayPicker">
+        <label class="weekday-chip"><input type="checkbox" value="0"><span>S</span></label>
+        <label class="weekday-chip"><input type="checkbox" value="1"><span>M</span></label>
+        <label class="weekday-chip"><input type="checkbox" value="2"><span>T</span></label>
+        <label class="weekday-chip"><input type="checkbox" value="3"><span>W</span></label>
+        <label class="weekday-chip"><input type="checkbox" value="4"><span>T</span></label>
+        <label class="weekday-chip"><input type="checkbox" value="5"><span>F</span></label>
+        <label class="weekday-chip"><input type="checkbox" value="6"><span>S</span></label>
+      </div>
+    </div>
+    <div class="field repeat-detail" id="monthlyModeWrap">
+      <label>Repeat by</label>
+      <select id="fMonthlyMode">
+        <option value="date">Day of month (e.g. the 15th)</option>
+        <option value="weekday">Day of week (e.g. third Thursday)</option>
+      </select>
+    </div>
+    <div class="field repeat-detail" id="monthlyWeekdayWrap">
+      <label>On the</label>
+      <div style="display:flex; gap:8px;">
+        <select id="fMonthlyOrdinal" style="flex:1;">
+          <option value="1">First</option>
+          <option value="2">Second</option>
+          <option value="3">Third</option>
+          <option value="4">Fourth</option>
+          <option value="-1">Last</option>
+        </select>
+        <select id="fMonthlyWeekday" style="flex:1;">
+          <option value="0">Sunday</option>
+          <option value="1">Monday</option>
+          <option value="2">Tuesday</option>
+          <option value="3">Wednesday</option>
+          <option value="4">Thursday</option>
+          <option value="5">Friday</option>
+          <option value="6">Saturday</option>
+        </select>
+      </div>
+    </div>
+    <div class="field repeat-detail" id="repeatUntilWrap">
+      <label>Ends <span style="text-transform:none; font-weight:400;">(optional)</span></label>
+      <input type="date" id="fUntil">
+    </div>
+    <div class="field">
+      <label>Address</label>
+      <input type="text" id="fAddress" placeholder="123 Main St">
+    </div>
+    <div class="field">
+      <label>Who's involved</label>
+      <div class="people-check" id="fPeople"></div>
+    </div>
+    <div class="modal-actions">
+      <div>
+        <button class="btn btn-ghost" id="deleteBtn" style="display:none; color:#B23A2E; border-color:#EBC7BE;">Delete</button>
+      </div>
+      <div class="right">
+        <button class="btn btn-ghost" id="cancelBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const PALETTE = ['#E4572E','#2A9D8F','#E0A93B','#6A5A9E','#3E7EA6','#C15A85','#4C8C4A','#B23A2E'];
+  const STORAGE_KEY = 'family-planner-data-v4';
+
+  let state = {
+    people: [
+      {id:'p1', name:'Yang', color:'#E4572E'},
+      {id:'p2', name:'Teddy', color:'#2A9D8F'},
+      {id:'p3', name:'Chanel', color:'#E0A93B'},
+      {id:'p4', name:'Grandma', color:'#6A5A9E'},
+      {id:'p5', name:'Walter', color:'#3E7EA6'}
+    ],
+    events: [
+      {id:'e1', activity:'Guangzhou (work trip)', date:'2026-07-05', endDate:'2026-07-09', start:'', end:'', address:'Guangzhou', people:['p1'], repeat:'none', repeatInterval:1, repeatUntil:'', excludedDates:[]},
+      {id:'e2', activity:'Artground @ Goodman', date:'2026-07-05', endDate:'', start:'09:15', end:'', address:'Goodman Arts Centre', people:['p2','p3','p4'], repeat:'none', repeatInterval:1, repeatUntil:'', excludedDates:[]},
+      {id:'e3', activity:"Teddy's SGH appointment", date:'2026-07-08', endDate:'', start:'10:00', end:'', address:'Singapore General Hospital', people:['p2','p3','p4'], repeat:'none', repeatInterval:1, repeatUntil:'', excludedDates:[]},
+      {id:'e4', activity:"Yuran's birthday lunch", date:'2026-07-11', endDate:'', start:'12:00', end:'', address:'', people:['p1','p2','p3'], repeat:'none', repeatInterval:1, repeatUntil:'', excludedDates:[]},
+      {id:'e5', activity:'FIFA @ Bt Timah CC', date:'2026-07-12', endDate:'', start:'09:00', end:'', address:'Bukit Timah CC', people:['p1','p2','p3','p4'], repeat:'none', repeatInterval:1, repeatUntil:'', excludedDates:[]},
+      {id:'e6', activity:'Chinese theatre', date:'2026-07-12', endDate:'', start:'15:00', end:'', address:'', people:['p1','p2','p3','p4'], repeat:'none', repeatInterval:1, repeatUntil:'', excludedDates:[]},
+      {id:'e7', activity:"Walter's Drontal", date:'2026-07-15', endDate:'', start:'', end:'', address:'', people:['p5'], repeat:'none', repeatInterval:1, repeatUntil:'', excludedDates:[]},
+      {id:'e8', activity:'Photoshoot', date:'2026-07-19', endDate:'', start:'08:00', end:'', address:'', people:['p1','p2','p3','p4','p5'], repeat:'none', repeatInterval:1, repeatUntil:'', excludedDates:[]},
+      {id:'e9', activity:"Walter's Spectra", date:'2026-07-30', endDate:'', start:'', end:'', address:'', people:['p5'], repeat:'monthly', repeatInterval:1, repeatUntil:'', weeklyDays:[], monthlyMode:'date', monthlyOrdinal:1, monthlyWeekday:0, excludedDates:[]},
+      {id:'e10', activity:"Tobias's birthday", date:'2026-08-08', endDate:'', start:'09:30', end:'', address:'', people:['p1','p2','p3'], repeat:'none', repeatInterval:1, repeatUntil:'', excludedDates:[]},
+      {id:'e11', activity:'KKH appointment', date:'2026-08-28', endDate:'', start:'10:00', end:'', address:'KK Women\'s and Children\'s Hospital', people:['p1','p2','p3','p4'], repeat:'none', repeatInterval:1, repeatUntil:'', excludedDates:[]},
+      {id:'e13', activity:'Europe trip (SIN-FRA 28 Sep 12:35-19:40, return ZUR-SIN 11 Oct 11:40-06:20+1)', date:'2026-09-28', endDate:'2026-10-12', start:'', end:'', address:'', people:['p1','p2','p3','p4'], repeat:'none', repeatInterval:1, repeatUntil:'', excludedDates:[]},
+      {id:'e15', activity:"Walter's Drontal", date:'2026-10-15', endDate:'', start:'', end:'', address:'', people:['p5'], repeat:'none', repeatInterval:1, repeatUntil:'', excludedDates:[]},
+      {id:'e16', activity:'Chinese class @ 6 Ave', date:'2026-07-02', endDate:'', start:'09:15', end:'', address:'6 Avenue', people:['p1','p2','p4'], repeat:'weekly', repeatInterval:1, repeatUntil:'', weeklyDays:[4], monthlyMode:'date', monthlyOrdinal:1, monthlyWeekday:0, excludedDates:[]},
+      {id:'e17', activity:"Walter's Drontal", date:'2027-01-15', endDate:'', start:'', end:'', address:'', people:['p5'], repeat:'monthly', repeatInterval:3, repeatUntil:'', weeklyDays:[], monthlyMode:'date', monthlyOrdinal:1, monthlyWeekday:0, excludedDates:[]}
+    ],
+    activeFilters: new Set(),
+    view: 'list',
+    calMonth: new Date().getMonth(),
+    calYear: new Date().getFullYear(),
+    selectedDay: null
+  };
+
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(parsed.people) state.people = parsed.people;
+        if(parsed.events) state.events = parsed.events;
+      }
+    }catch(e){ /* storage unavailable in this environment; using in-memory defaults */ }
+  }
+  function save(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({people:state.people, events:state.events}));
+    }catch(e){ /* ignore if storage blocked */ }
+  }
+
+  function uid(){ return 'e'+Math.random().toString(36).slice(2,10); }
+  function personById(id){ return state.people.find(p=>p.id===id); }
+
+  function fmtDate(dstr){
+    const d = new Date(dstr+'T00:00:00');
+    return d;
+  }
+  function pad(n){ return n.toString().padStart(2,'0'); }
+  function toLocalISO(d){
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+  function to12h(t){
+    if(!t) return '';
+    let [h,m] = t.split(':').map(Number);
+    const ap = h>=12?'PM':'AM';
+    h = h%12; if(h===0) h=12;
+    return h+':'+pad(m)+' '+ap;
+  }
+  function addDays(dateStr, n){
+    const d = new Date(dateStr+'T00:00:00');
+    d.setDate(d.getDate()+n);
+    return toLocalISO(d);
+  }
+  function addMonths(dateStr, n){
+    const d = new Date(dateStr+'T00:00:00');
+    const day = d.getDate();
+    d.setMonth(d.getMonth()+n);
+    if(d.getDate() !== day){ d.setDate(0); } // clamp e.g. Jan 31 + 1mo -> last day of Feb
+    return toLocalISO(d);
+  }
+  function daysBetween(a,b){
+    const da = new Date(a+'T00:00:00'), db = new Date(b+'T00:00:00');
+    return Math.round((db-da)/86400000);
+  }
+  function shortDate(dateStr){
+    return fmtDate(dateStr).toLocaleDateString(undefined,{month:'short', day:'numeric'});
+  }
+  function getWeekStart(dateStr){
+    const d = new Date(dateStr+'T00:00:00');
+    d.setDate(d.getDate()-d.getDay());
+    return toLocalISO(d);
+  }
+  function getNthWeekdayOfMonth(y, m, weekday, ordinal){
+    const daysInMonth = new Date(y, m+1, 0).getDate();
+    if(ordinal === -1){
+      let d = daysInMonth;
+      while(new Date(y,m,d).getDay() !== weekday){ d--; }
+      return `${y}-${pad(m+1)}-${pad(d)}`;
+    }
+    const first = new Date(y,m,1);
+    const firstOccurrence = 1 + ((7 + weekday - first.getDay()) % 7);
+    const day = firstOccurrence + (ordinal-1)*7;
+    if(day > daysInMonth) return null; // e.g. a "5th Monday" that doesn't exist that month
+    return `${y}-${pad(m+1)}-${pad(day)}`;
+  }
+  // Expands a master event into its occurrences. Non-recurring events always
+  // return their single occurrence regardless of range. Recurring events are
+  // bounded by [rangeStart, rangeEnd] (and repeatUntil, if set) to keep this finite.
+  function getOccurrences(ev, rangeStart, rangeEnd){
+    const endDate = ev.endDate || ev.date;
+    const duration = Math.max(0, daysBetween(ev.date, endDate));
+    const excluded = new Set(ev.excludedDates||[]);
+    const results = [];
+    const until = ev.repeatUntil || null;
+
+    if(!ev.repeat || ev.repeat==='none'){
+      if(!excluded.has(ev.date)) results.push({start:ev.date, end:endDate});
+      return results;
+    }
+
+    const interval = Math.max(1, parseInt(ev.repeatInterval,10)||1);
+
+    if(ev.repeat==='weekly'){
+      const startWeekday = new Date(ev.date+'T00:00:00').getDay();
+      const days = (ev.weeklyDays && ev.weeklyDays.length) ? ev.weeklyDays : [startWeekday];
+      const startWeekStart = getWeekStart(ev.date);
+      let cur = ev.date;
+      let iterations = 0;
+      const MAX_ITER = 4000; // ~11 years of days, ample for a family calendar
+      while(iterations < MAX_ITER){
+        if(until && cur > until) break;
+        if(cur > rangeEnd) break;
+        if(cur >= ev.date && days.includes(new Date(cur+'T00:00:00').getDay())){
+          const weekIndex = Math.round(daysBetween(startWeekStart, getWeekStart(cur))/7);
+          if(weekIndex % interval === 0){
+            const occEnd = duration>0 ? addDays(cur, duration) : cur;
+            if(occEnd >= rangeStart && !excluded.has(cur)){
+              results.push({start:cur, end:occEnd});
+            }
+          }
+        }
+        cur = addDays(cur, 1);
+        iterations++;
+      }
+      return results;
+    }
+
+    if(ev.repeat==='monthly'){
+      if(ev.monthlyMode === 'weekday' && ev.monthlyWeekday != null && ev.monthlyOrdinal){
+        let cursor = new Date(ev.date+'T00:00:00');
+        cursor.setDate(1);
+        let iterations = 0;
+        const MAX_OCC = 500;
+        while(iterations < MAX_OCC){
+          const occDate = getNthWeekdayOfMonth(cursor.getFullYear(), cursor.getMonth(), ev.monthlyWeekday, ev.monthlyOrdinal);
+          if(occDate && occDate >= ev.date){
+            if(until && occDate > until) break;
+            if(occDate > rangeEnd) break;
+            const occEnd = duration>0 ? addDays(occDate, duration) : occDate;
+            if(occEnd >= rangeStart && !excluded.has(occDate)){
+              results.push({start:occDate, end:occEnd});
+            }
+          }
+          cursor.setMonth(cursor.getMonth()+interval);
+          iterations++;
+        }
+        return results;
+      }
+      // default: same date-of-month each time
+      let cur = ev.date;
+      let count = 0;
+      const MAX_OCC = 500;
+      while(count < MAX_OCC){
+        if(until && cur > until) break;
+        if(cur > rangeEnd) break;
+        const occEnd = duration>0 ? addDays(cur, duration) : cur;
+        if(occEnd >= rangeStart && !excluded.has(cur)){
+          results.push({start:cur, end:occEnd});
+        }
+        cur = addMonths(cur, interval);
+        count++;
+      }
+      return results;
+    }
+
+    return results;
+  }
+
+  // ---------- PEOPLE ----------
+  function renderPeople(){
+    const listEl = document.getElementById('peopleList');
+    listEl.innerHTML = '';
+    const editing = document.getElementById('addPersonRow').style.display !== 'none';
+    state.people.forEach(p=>{
+      const el = document.createElement('div');
+      el.className = 'person-edit';
+      if(editing){
+        el.innerHTML = `<input type="color" value="${p.color}" data-id="${p.id}" class="pc-color">
+          <span>${p.name}</span>
+          <button class="icon-btn pc-remove" data-id="${p.id}" title="Remove person">&times;</button>`;
+      } else {
+        el.innerHTML = `<span class="dot" style="width:9px;height:9px;border-radius:50%;background:${p.color};display:inline-block;"></span><span>${p.name}</span>`;
+      }
+      listEl.appendChild(el);
+    });
+    if(editing){
+      listEl.querySelectorAll('.pc-color').forEach(inp=>{
+        inp.addEventListener('input', e=>{
+          const p = personById(e.target.dataset.id);
+          p.color = e.target.value;
+          save(); renderAll();
+        });
+      });
+      listEl.querySelectorAll('.pc-remove').forEach(btn=>{
+        btn.addEventListener('click', e=>{
+          const id = e.target.dataset.id;
+          if(state.events.some(ev=>ev.people.includes(id))){
+            if(!confirm('This person is on one or more events. Remove them anyway? They will be taken off those events.')) return;
+            state.events.forEach(ev=>{ ev.people = ev.people.filter(pid=>pid!==id); });
+          }
+          state.people = state.people.filter(p=>p.id!==id);
+          state.activeFilters.delete(id);
+          save(); renderAll();
+        });
+      });
+    }
+  }
+
+  document.getElementById('togglePeopleBtn').addEventListener('click', ()=>{
+    const row = document.getElementById('addPersonRow');
+    row.style.display = row.style.display==='none' ? 'flex' : 'none';
+    document.getElementById('togglePeopleBtn').textContent = row.style.display==='none' ? 'Manage' : 'Done';
+    renderPeople();
+  });
+
+  document.getElementById('addPersonBtn').addEventListener('click', ()=>{
+    const nameInput = document.getElementById('newPersonName');
+    const colorInput = document.getElementById('newPersonColor');
+    const name = nameInput.value.trim();
+    if(!name) return;
+    const usedColors = state.people.map(p=>p.color);
+    let color = colorInput.value;
+    state.people.push({id:uid(), name, color});
+    nameInput.value = '';
+    const nextColor = PALETTE.find(c=>!state.people.some(p=>p.color===c)) || PALETTE[state.people.length % PALETTE.length];
+    colorInput.value = nextColor;
+    save(); renderAll();
+  });
+
+  // ---------- FILTERS ----------
+  function renderFilters(){
+    const bar = document.getElementById('filterBar');
+    bar.innerHTML = '<span class="label">Show</span>';
+    const allChip = document.createElement('button');
+    allChip.className = 'chip reset' + (state.activeFilters.size===0 ? ' on' : '');
+    allChip.style.background = state.activeFilters.size===0 ? 'var(--pine)' : '#fff';
+    allChip.style.color = state.activeFilters.size===0 ? '#fff' : 'var(--ink-soft)';
+    allChip.textContent = 'Everyone';
+    allChip.addEventListener('click', ()=>{ state.activeFilters.clear(); save(); renderAll(); });
+    bar.appendChild(allChip);
+
+    state.people.forEach(p=>{
+      const chip = document.createElement('button');
+      const on = state.activeFilters.has(p.id);
+      chip.className = 'chip' + (on ? ' on' : '');
+      if(on) chip.style.background = p.color;
+      chip.innerHTML = `<span class="dot" style="background:${on?'#fff':p.color};"></span>${p.name}`;
+      chip.addEventListener('click', ()=>{
+        if(state.activeFilters.has(p.id)) state.activeFilters.delete(p.id);
+        else state.activeFilters.add(p.id);
+        renderAll();
+      });
+      bar.appendChild(chip);
+    });
+  }
+
+  function passesFilter(ev){
+    if(state.activeFilters.size===0) return true;
+    return ev.people.some(pid=>state.activeFilters.has(pid));
+  }
+
+  // ---------- LIST VIEW ----------
+  function renderList(){
+    const el = document.getElementById('listView');
+    const today = toLocalISO(new Date());
+    const rangeStart = addDays(today, -60);
+    const rangeEnd = addDays(today, 365);
+    let entries = [];
+    state.events.filter(passesFilter).forEach(ev=>{
+      getOccurrences(ev, rangeStart, rangeEnd).forEach(occ=>{
+        entries.push({ev, occStart:occ.start, occEnd:occ.end});
+      });
+    });
+    if(entries.length===0){
+      el.innerHTML = `<div class="empty-state"><h3>Nothing on the board yet</h3><p>Add an event to get the week going.</p></div>`;
+      return;
+    }
+    entries.sort((a,b)=>{
+      if(a.occStart!==b.occStart) return a.occStart<b.occStart?-1:1;
+      return (a.ev.start||'').localeCompare(b.ev.start||'');
+    });
+    const groups = {};
+    entries.forEach(entry=>{
+      groups[entry.occStart] = groups[entry.occStart] || [];
+      groups[entry.occStart].push(entry);
+    });
+    el.innerHTML = '';
+    Object.keys(groups).sort().forEach(date=>{
+      const d = fmtDate(date);
+      const wrap = document.createElement('div');
+      wrap.className = 'day-group';
+      const heading = document.createElement('div');
+      heading.className = 'day-heading';
+      heading.innerHTML = `<span class="d-num">${d.getDate()}</span><span class="d-rest">${d.toLocaleDateString(undefined,{weekday:'long',month:'long'})}</span>`;
+      wrap.appendChild(heading);
+      groups[date].forEach(entry=>{
+        wrap.appendChild(renderEventCard(entry.ev, entry.occStart, entry.occEnd));
+      });
+      el.appendChild(wrap);
+    });
+  }
+
+  const WEEKDAY_ABBR = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const ORDINAL_WORD = {1:'1st', 2:'2nd', 3:'3rd', 4:'4th', '-1':'last'};
+  function describeRepeat(ev){
+    if(!ev.repeat || ev.repeat==='none') return '';
+    const every = (ev.repeatInterval && ev.repeatInterval>1) ? `${ev.repeatInterval}` : '';
+    if(ev.repeat==='weekly'){
+      const days = (ev.weeklyDays && ev.weeklyDays.length) ? ev.weeklyDays.slice().sort((a,b)=>a-b) : [new Date(ev.date+'T00:00:00').getDay()];
+      const dayLabel = days.map(d=>WEEKDAY_ABBR[d]).join('/');
+      return every ? `Every ${every} wks &middot; ${dayLabel}` : `Weekly &middot; ${dayLabel}`;
+    }
+    if(ev.repeat==='monthly'){
+      if(ev.monthlyMode==='weekday' && ev.monthlyWeekday!=null && ev.monthlyOrdinal){
+        const label = `${ORDINAL_WORD[ev.monthlyOrdinal]} ${WEEKDAY_ABBR[ev.monthlyWeekday]}`;
+        return every ? `Every ${every} mo &middot; ${label}` : `Monthly &middot; ${label}`;
+      }
+      return every ? `Every ${every} months` : 'Monthly';
+    }
+    return '';
+  }
+  function renderEventCard(ev, occStart, occEnd){
+    occStart = occStart || ev.date;
+    occEnd = occEnd || ev.endDate || ev.date;
+    const multiDay = occStart !== occEnd;
+    const card = document.createElement('div');
+    card.className = 'event-card';
+    const colors = ev.people.map(pid=>(personById(pid)||{}).color).filter(Boolean);
+    const stripe = colors.length ? colors : ['#ccc'];
+    const timeLabel = multiDay
+      ? `${shortDate(occStart)}<span>&rarr; ${shortDate(occEnd)}</span>`
+      : `${to12h(ev.start)}<span>${ev.end ? 'to '+to12h(ev.end) : ''}</span>`;
+    const repeatBadge = (ev.repeat && ev.repeat!=='none')
+      ? `<span class="repeat-badge">&#8635; ${describeRepeat(ev)}</span>`
+      : '';
+    card.innerHTML = `
+      <div class="event-time">${timeLabel}</div>
+      <div class="event-main">
+        <div class="activity">${escapeHtml(ev.activity)}${repeatBadge}</div>
+        ${multiDay && (ev.start||ev.end) ? `<div class="addr">${to12h(ev.start)}${ev.end?' &ndash; '+to12h(ev.end):''} daily</div>` : ''}
+        ${ev.address ? `<div class="addr">${escapeHtml(ev.address)}</div>` : ''}
+      </div>
+      <div class="event-people">${ev.people.map(pid=>{
+        const p = personById(pid);
+        if(!p) return '';
+        return `<span class="person-pill"><span class="dot" style="background:${p.color}"></span>${escapeHtml(p.name)}</span>`;
+      }).join('')}</div>
+      <div class="event-actions">
+        <button class="icon-btn edit-btn" title="Edit">&#9998;</button>
+        <button class="icon-btn del-btn" title="Delete">&times;</button>
+      </div>
+    `;
+    if(stripe.length===1){
+      card.style.borderLeft = `8px solid ${stripe[0]}`;
+    } else {
+      const step = 100/stripe.length;
+      const stops = stripe.map((c,i)=>`${c} ${i*step}%, ${c} ${(i+1)*step}%`).join(', ');
+      card.style.borderLeft = '8px solid transparent';
+      card.style.borderImage = `linear-gradient(to bottom, ${stops}) 1`;
+    }
+    card.style.paddingLeft = '14px';
+    card.querySelector('.edit-btn').addEventListener('click', ()=>openModal(ev));
+    card.querySelector('.del-btn').addEventListener('click', ()=>deleteOccurrence(ev, occStart));
+    return card;
+  }
+
+  function deleteOccurrence(ev, occStart){
+    if(ev.repeat && ev.repeat!=='none'){
+      const wholeSeries = confirm('This is a repeating event. Click OK to delete the entire series, or Cancel to just remove this one date.');
+      if(wholeSeries){
+        state.events = state.events.filter(e=>e.id!==ev.id);
+        save(); renderAll();
+      } else {
+        ev.excludedDates = ev.excludedDates || [];
+        if(!ev.excludedDates.includes(occStart)) ev.excludedDates.push(occStart);
+        save(); renderAll();
+      }
+    } else {
+      if(confirm('Delete this event?')){
+        state.events = state.events.filter(e=>e.id!==ev.id);
+        save(); renderAll();
+      }
+    }
+  }
+
+  function escapeHtml(s){
+    const div = document.createElement('div');
+    div.textContent = s||'';
+    return div.innerHTML;
+  }
+
+  // ---------- CALENDAR VIEW ----------
+  function renderCalendar(){
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
+    const y = state.calYear, m = state.calMonth;
+    document.getElementById('monthLabel').textContent = new Date(y,m,1).toLocaleDateString(undefined,{month:'long',year:'numeric'});
+    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{
+      const dow = document.createElement('div');
+      dow.className='cal-dow'; dow.textContent=d;
+      grid.appendChild(dow);
+    });
+    const firstDay = new Date(y,m,1);
+    const startOffset = firstDay.getDay();
+    const daysInMonth = new Date(y,m+1,0).getDate();
+    const daysInPrevMonth = new Date(y,m,0).getDate();
+    const todayStr = toLocalISO(new Date());
+
+    const cells = [];
+    for(let i=startOffset-1;i>=0;i--){
+      cells.push({day:daysInPrevMonth-i, other:true, dateStr:null});
+    }
+    for(let d=1; d<=daysInMonth; d++){
+      const dateStr = `${y}-${pad(m+1)}-${pad(d)}`;
+      cells.push({day:d, other:false, dateStr});
+    }
+    while(cells.length % 7 !== 0){
+      const idx = cells.length - (startOffset+daysInMonth);
+      cells.push({day:idx+1, other:true, dateStr:null});
+    }
+
+    const monthStart = `${y}-${pad(m+1)}-01`;
+    const monthEnd = `${y}-${pad(m+1)}-${pad(daysInMonth)}`;
+    const monthEntries = [];
+    state.events.filter(passesFilter).forEach(ev=>{
+      getOccurrences(ev, monthStart, monthEnd).forEach(occ=>{
+        monthEntries.push({ev, occStart:occ.start, occEnd:occ.end});
+      });
+    });
+
+    cells.forEach(c=>{
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell' + (c.other?' other-month':'') + (c.dateStr===todayStr?' today':'');
+      const num = document.createElement('div');
+      num.className='num';
+      num.textContent = c.day;
+      cell.appendChild(num);
+      if(c.dateStr){
+        const dayEntries = monthEntries.filter(en=> en.occStart<=c.dateStr && en.occEnd>=c.dateStr)
+          .sort((a,b)=>(a.ev.start||'').localeCompare(b.ev.start||''));
+        dayEntries.slice(0,3).forEach(entry=>{
+          const ev = entry.ev;
+          const dots = ev.people.map(pid=>{
+            const p = personById(pid);
+            return p ? `<span class="dot" style="background:${p.color}"></span>` : '';
+          }).join('');
+          const tag = document.createElement('div');
+          tag.className='cal-ev';
+          tag.innerHTML = `${dots || '<span class="dot" style="background:#999"></span>'}${escapeHtml(ev.activity)}`;
+          cell.appendChild(tag);
+        });
+        if(dayEntries.length>3){
+          const more = document.createElement('div');
+          more.className='cal-more';
+          more.textContent = `+${dayEntries.length-3} more`;
+          cell.appendChild(more);
+        }
+        cell.addEventListener('click', ()=>{
+          state.selectedDay = c.dateStr;
+          renderDayPanel();
+        });
+      } else {
+        cell.style.cursor='default';
+      }
+      grid.appendChild(cell);
+    });
+
+    renderDayPanel();
+  }
+
+  function renderDayPanel(){
+    const panel = document.getElementById('dayPanel');
+    if(!state.selectedDay){ panel.style.display='none'; return; }
+    panel.style.display='block';
+    const d = fmtDate(state.selectedDay);
+    const dayEntries = [];
+    state.events.filter(passesFilter).forEach(ev=>{
+      getOccurrences(ev, state.selectedDay, state.selectedDay).forEach(occ=>{
+        dayEntries.push({ev, occStart:occ.start, occEnd:occ.end});
+      });
+    });
+    dayEntries.sort((a,b)=>(a.ev.start||'').localeCompare(b.ev.start||''));
+    panel.innerHTML = `<h3>${d.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})}</h3>`;
+    if(dayEntries.length===0){
+      panel.innerHTML += `<div class="empty-state" style="padding:30px;">Nothing scheduled. <button class="btn btn-primary btn-small" id="quickAdd">+ Add event</button></div>`;
+    } else {
+      dayEntries.forEach(entry=>panel.appendChild(renderEventCard(entry.ev, entry.occStart, entry.occEnd)));
+      const addBtn = document.createElement('button');
+      addBtn.className='btn btn-ghost btn-small';
+      addBtn.textContent = '+ Add another event this day';
+      addBtn.style.marginTop='6px';
+      addBtn.addEventListener('click', ()=>openModal(null, state.selectedDay));
+      panel.appendChild(addBtn);
+    }
+    const quick = document.getElementById('quickAdd');
+    if(quick) quick.addEventListener('click', ()=>openModal(null, state.selectedDay));
+  }
+
+  document.getElementById('prevMonth').addEventListener('click', ()=>{
+    state.calMonth--; if(state.calMonth<0){state.calMonth=11; state.calYear--;}
+    state.selectedDay=null;
+    renderCalendar();
+  });
+  document.getElementById('nextMonth').addEventListener('click', ()=>{
+    state.calMonth++; if(state.calMonth>11){state.calMonth=0; state.calYear++;}
+    state.selectedDay=null;
+    renderCalendar();
+  });
+  document.getElementById('todayBtn').addEventListener('click', ()=>{
+    const now = new Date();
+    state.calMonth = now.getMonth(); state.calYear = now.getFullYear();
+    state.selectedDay = toLocalISO(now);
+    renderCalendar();
+  });
+
+  // ---------- VIEW TOGGLE ----------
+  document.getElementById('listBtn').addEventListener('click', ()=>switchView('list'));
+  document.getElementById('calBtn').addEventListener('click', ()=>switchView('calendar'));
+  document.getElementById('exportBtn').addEventListener('click', ()=>switchView('export'));
+  function switchView(v){
+    state.view = v;
+    document.getElementById('listBtn').classList.toggle('active', v==='list');
+    document.getElementById('calBtn').classList.toggle('active', v==='calendar');
+    document.getElementById('exportBtn').classList.toggle('active', v==='export');
+    document.getElementById('listView').style.display = v==='list' ? 'block':'none';
+    document.getElementById('calView').style.display = v==='calendar' ? 'block':'none';
+    document.getElementById('exportView').style.display = v==='export' ? 'block':'none';
+    if(v==='calendar') renderCalendar();
+    if(v==='export') renderExport();
+  }
+
+  function buildExportText(){
+    const rangeStart = addDays(toLocalISO(new Date()), -60);
+    const rangeEnd = addDays(toLocalISO(new Date()), 365);
+    let entries = [];
+    state.events.filter(passesFilter).forEach(ev=>{
+      getOccurrences(ev, rangeStart, rangeEnd).forEach(occ=>{
+        entries.push({ev, occStart:occ.start, occEnd:occ.end});
+      });
+    });
+    entries.sort((a,b)=>{
+      if(a.occStart!==b.occStart) return a.occStart<b.occStart?-1:1;
+      return (a.ev.start||'').localeCompare(b.ev.start||'');
+    });
+    if(entries.length===0) return 'Nothing scheduled.';
+    const groups = {};
+    entries.forEach(entry=>{
+      groups[entry.occStart] = groups[entry.occStart] || [];
+      groups[entry.occStart].push(entry);
+    });
+    const lines = [];
+    Object.keys(groups).sort().forEach(date=>{
+      const d = fmtDate(date);
+      lines.push(`${d.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric', year:'numeric'})}`);
+      groups[date].forEach(entry=>{
+        const ev = entry.ev;
+        const multiDay = entry.occStart !== entry.occEnd;
+        let timePart;
+        if(multiDay){
+          timePart = `${shortDate(entry.occStart)} - ${shortDate(entry.occEnd)}`;
+        } else if(ev.start){
+          timePart = ev.end ? `${to12h(ev.start)}-${to12h(ev.end)}` : to12h(ev.start);
+        } else {
+          timePart = 'All day';
+        }
+        const peopleNames = ev.people.map(pid=>{ const p = personById(pid); return p ? p.name : ''; }).filter(Boolean).join(', ');
+        let line = `  - [${timePart}] ${ev.activity}`;
+        if(ev.address) line += ` @ ${ev.address}`;
+        if(peopleNames) line += ` (${peopleNames})`;
+        lines.push(line);
+      });
+      lines.push('');
+    });
+    return lines.join('\n').trim();
+  }
+
+  function renderExport(){
+    document.getElementById('exportText').value = buildExportText();
+  }
+
+  document.getElementById('copyExportBtn').addEventListener('click', async ()=>{
+    const text = document.getElementById('exportText').value;
+    const btn = document.getElementById('copyExportBtn');
+    try{
+      await navigator.clipboard.writeText(text);
+      btn.textContent = 'Copied!';
+    }catch(e){
+      // Clipboard API unavailable (e.g. non-HTTPS context) — fall back to select-all for manual copy
+      const ta = document.getElementById('exportText');
+      ta.focus();
+      ta.select();
+      btn.textContent = 'Select & press Ctrl/Cmd+C';
+    }
+    setTimeout(()=>{ btn.textContent = 'Copy to clipboard'; }, 1800);
+  });
+
+  // ---------- MODAL ----------
+  const overlay = document.getElementById('overlay');
+  function openModal(ev, presetDate){
+    document.getElementById('modalTitle').textContent = ev ? 'Edit event' : 'Add event';
+    document.getElementById('editId').value = ev ? ev.id : '';
+    document.getElementById('fActivity').value = ev ? ev.activity : '';
+    document.getElementById('fDate').value = ev ? ev.date : (presetDate || toLocalISO(new Date()));
+    document.getElementById('fStart').value = ev ? ev.start : '';
+    document.getElementById('fEnd').value = ev ? ev.end : '';
+    document.getElementById('fAddress').value = ev ? ev.address : '';
+    document.getElementById('fEndDate').value = ev && ev.endDate ? ev.endDate : '';
+    document.getElementById('fRepeat').value = ev && ev.repeat ? ev.repeat : 'none';
+    document.getElementById('fInterval').value = ev && ev.repeatInterval ? ev.repeatInterval : 1;
+    document.getElementById('fUntil').value = ev && ev.repeatUntil ? ev.repeatUntil : '';
+    const modalDate = document.getElementById('fDate').value;
+    const defaultWeekday = new Date(modalDate+'T00:00:00').getDay();
+    setWeekdayChips(ev && ev.weeklyDays && ev.weeklyDays.length ? ev.weeklyDays : [defaultWeekday]);
+    const monthlyDefaults = computeMonthlyDefaults(modalDate);
+    document.getElementById('fMonthlyMode').value = ev && ev.monthlyMode ? ev.monthlyMode : 'date';
+    document.getElementById('fMonthlyOrdinal').value = ev && ev.monthlyOrdinal != null ? ev.monthlyOrdinal : monthlyDefaults.ordinal;
+    document.getElementById('fMonthlyWeekday').value = ev && ev.monthlyWeekday != null ? ev.monthlyWeekday : monthlyDefaults.weekday;
+    updateRepeatUI();
+    const peopleWrap = document.getElementById('fPeople');
+    peopleWrap.innerHTML = '';
+    state.people.forEach(p=>{
+      const checked = ev && ev.people.includes(p.id);
+      const lab = document.createElement('label');
+      lab.style.borderColor = checked ? p.color : '';
+      lab.innerHTML = `<input type="checkbox" value="${p.id}" ${checked?'checked':''}><span class="dot" style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block;"></span>${escapeHtml(p.name)}`;
+      peopleWrap.appendChild(lab);
+    });
+    document.getElementById('deleteBtn').style.display = ev ? 'inline-block' : 'none';
+    overlay.classList.add('show');
+  }
+  function closeModal(){ overlay.classList.remove('show'); }
+
+  function updateRepeatUI(){
+    const val = document.getElementById('fRepeat').value;
+    const show = val !== 'none';
+    document.getElementById('repeatIntervalWrap').classList.toggle('show', show);
+    document.getElementById('repeatUntilWrap').classList.toggle('show', show);
+    document.getElementById('repeatUnitLabel').textContent = val==='monthly' ? 'month(s)' : 'week(s)';
+    document.getElementById('weeklyDaysWrap').classList.toggle('show', val==='weekly');
+    document.getElementById('monthlyModeWrap').classList.toggle('show', val==='monthly');
+    updateMonthlyWeekdayVisibility();
+  }
+  function updateMonthlyWeekdayVisibility(){
+    const repeatVal = document.getElementById('fRepeat').value;
+    const modeVal = document.getElementById('fMonthlyMode').value;
+    document.getElementById('monthlyWeekdayWrap').classList.toggle('show', repeatVal==='monthly' && modeVal==='weekday');
+  }
+  document.getElementById('fRepeat').addEventListener('change', updateRepeatUI);
+  document.getElementById('fMonthlyMode').addEventListener('change', updateMonthlyWeekdayVisibility);
+
+  function setWeekdayChips(selectedDays){
+    document.querySelectorAll('#weekdayPicker input').forEach(inp=>{
+      const on = selectedDays.includes(parseInt(inp.value,10));
+      inp.checked = on;
+      inp.closest('.weekday-chip').classList.toggle('checked', on);
+    });
+  }
+  document.querySelectorAll('#weekdayPicker input').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      inp.closest('.weekday-chip').classList.toggle('checked', inp.checked);
+    });
+  });
+  function computeMonthlyDefaults(dateStr){
+    const d = new Date(dateStr+'T00:00:00');
+    const weekday = d.getDay();
+    const dayNum = d.getDate();
+    const daysInMonth = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+    const isLast = (dayNum + 7) > daysInMonth;
+    return {weekday, ordinal: isLast ? -1 : Math.ceil(dayNum/7)};
+  }
+
+  document.getElementById('addEventBtn').addEventListener('click', ()=>openModal(null, state.view==='calendar'?state.selectedDay:null));
+  document.getElementById('cancelBtn').addEventListener('click', closeModal);
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
+
+  document.getElementById('saveBtn').addEventListener('click', ()=>{
+    const id = document.getElementById('editId').value;
+    const activity = document.getElementById('fActivity').value.trim();
+    const date = document.getElementById('fDate').value;
+    const endDate = document.getElementById('fEndDate').value || '';
+    const start = document.getElementById('fStart').value;
+    const end = document.getElementById('fEnd').value;
+    const address = document.getElementById('fAddress').value.trim();
+    const people = Array.from(document.querySelectorAll('#fPeople input:checked')).map(i=>i.value);
+    const repeat = document.getElementById('fRepeat').value;
+    const repeatInterval = Math.max(1, parseInt(document.getElementById('fInterval').value,10)||1);
+    const repeatUntil = document.getElementById('fUntil').value || '';
+    const weeklyDays = Array.from(document.querySelectorAll('#weekdayPicker input:checked')).map(i=>parseInt(i.value,10));
+    const monthlyMode = document.getElementById('fMonthlyMode').value;
+    const monthlyOrdinal = parseInt(document.getElementById('fMonthlyOrdinal').value,10);
+    const monthlyWeekday = parseInt(document.getElementById('fMonthlyWeekday').value,10);
+
+    if(!activity || !date){
+      alert('Please fill in at least an activity and a date.');
+      return;
+    }
+    if(endDate && endDate < date){
+      alert('End date can\'t be before the start date.');
+      return;
+    }
+    if(repeatUntil && repeatUntil < date){
+      alert('The "ends" date can\'t be before the start date.');
+      return;
+    }
+    const finalWeeklyDays = weeklyDays.length ? weeklyDays : [new Date(date+'T00:00:00').getDay()];
+    if(id){
+      const ev = state.events.find(e=>e.id===id);
+      Object.assign(ev, {activity, date, endDate, start, end, address, people, repeat, repeatInterval, repeatUntil, weeklyDays:finalWeeklyDays, monthlyMode, monthlyOrdinal, monthlyWeekday});
+    } else {
+      state.events.push({id:uid(), activity, date, endDate, start, end, address, people, repeat, repeatInterval, repeatUntil, weeklyDays:finalWeeklyDays, monthlyMode, monthlyOrdinal, monthlyWeekday, excludedDates:[]});
+    }
+    save();
+    closeModal();
+    renderAll();
+  });
+
+  document.getElementById('deleteBtn').addEventListener('click', ()=>{
+    const id = document.getElementById('editId').value;
+    if(!id) return;
+    const ev = state.events.find(e=>e.id===id);
+    const msg = (ev && ev.repeat && ev.repeat!=='none') ? 'Delete this entire repeating series? (To remove just one date, close this and use the × on that specific event instead.)' : 'Delete this event?';
+    if(confirm(msg)){
+      state.events = state.events.filter(e=>e.id!==id);
+      save();
+      closeModal();
+      renderAll();
+    }
+  });
+
+  // ---------- RENDER ALL ----------
+  function renderAll(){
+    renderPeople();
+    renderFilters();
+    renderList();
+    if(state.view==='calendar') renderCalendar();
+    if(state.view==='export') renderExport();
+  }
+
+  load();
+  renderAll();
+})();
+</script>
+</body>
+</html>
