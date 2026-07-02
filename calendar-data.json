@@ -1,0 +1,311 @@
+{
+  "people": [
+    {
+      "id": "p1",
+      "name": "Yang",
+      "color": "#E4572E"
+    },
+    {
+      "id": "p2",
+      "name": "Teddy",
+      "color": "#2A9D8F"
+    },
+    {
+      "id": "p3",
+      "name": "Chanel",
+      "color": "#E0A93B"
+    },
+    {
+      "id": "p4",
+      "name": "Grandma",
+      "color": "#6A5A9E"
+    },
+    {
+      "id": "p5",
+      "name": "Walter",
+      "color": "#3E7EA6"
+    }
+  ],
+  "events": [
+    {
+      "id": "e1",
+      "activity": "Guangzhou (work trip)",
+      "date": "2026-07-05",
+      "endDate": "2026-07-09",
+      "start": "",
+      "end": "",
+      "address": "Guangzhou",
+      "people": [
+        "p1"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "excludedDates": []
+    },
+    {
+      "id": "e2",
+      "activity": "Artground @ Goodman",
+      "date": "2026-07-05",
+      "endDate": "",
+      "start": "09:15",
+      "end": "",
+      "address": "Goodman Arts Centre",
+      "people": [
+        "p2",
+        "p3",
+        "p4"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "excludedDates": []
+    },
+    {
+      "id": "e3",
+      "activity": "Teddy's SGH appointment",
+      "date": "2026-07-08",
+      "endDate": "",
+      "start": "10:00",
+      "end": "",
+      "address": "Singapore General Hospital",
+      "people": [
+        "p2",
+        "p3",
+        "p4"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "excludedDates": []
+    },
+    {
+      "id": "e4",
+      "activity": "Yuran's birthday lunch",
+      "date": "2026-07-11",
+      "endDate": "",
+      "start": "12:00",
+      "end": "",
+      "address": "",
+      "people": [
+        "p1",
+        "p2",
+        "p3"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "excludedDates": []
+    },
+    {
+      "id": "e5",
+      "activity": "FIFA @ Bt Timah CC",
+      "date": "2026-07-12",
+      "endDate": "",
+      "start": "09:00",
+      "end": "",
+      "address": "Bukit Timah CC",
+      "people": [
+        "p1",
+        "p2",
+        "p3",
+        "p4"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "excludedDates": []
+    },
+    {
+      "id": "e6",
+      "activity": "Chinese theatre",
+      "date": "2026-07-12",
+      "endDate": "",
+      "start": "15:00",
+      "end": "",
+      "address": "",
+      "people": [
+        "p1",
+        "p2",
+        "p3",
+        "p4"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "excludedDates": []
+    },
+    {
+      "id": "e7",
+      "activity": "Walter's Drontal",
+      "date": "2026-07-15",
+      "endDate": "",
+      "start": "",
+      "end": "",
+      "address": "",
+      "people": [
+        "p5"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "excludedDates": []
+    },
+    {
+      "id": "e8",
+      "activity": "Photoshoot",
+      "date": "2026-07-19",
+      "endDate": "",
+      "start": "08:00",
+      "end": "",
+      "address": "",
+      "people": [
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "excludedDates": []
+    },
+    {
+      "id": "e9",
+      "activity": "Walter's Spectra",
+      "date": "2026-07-30",
+      "endDate": "",
+      "start": "",
+      "end": "",
+      "address": "",
+      "people": [
+        "p5"
+      ],
+      "repeat": "monthly",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "weeklyDays": [],
+      "monthlyMode": "date",
+      "monthlyOrdinal": 1,
+      "monthlyWeekday": 0,
+      "excludedDates": []
+    },
+    {
+      "id": "e10",
+      "activity": "Tobias's birthday",
+      "date": "2026-08-08",
+      "endDate": "",
+      "start": "09:30",
+      "end": "",
+      "address": "",
+      "people": [
+        "p1",
+        "p2",
+        "p3"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "excludedDates": []
+    },
+    {
+      "id": "e11",
+      "activity": "KKH appointment",
+      "date": "2026-08-28",
+      "endDate": "",
+      "start": "10:00",
+      "end": "",
+      "address": "KK Women's and Children's Hospital",
+      "people": [
+        "p1",
+        "p2",
+        "p3",
+        "p4"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "excludedDates": []
+    },
+    {
+      "id": "e13",
+      "activity": "Europe trip (SIN-FRA 28 Sep 12:35-19:40, return ZUR-SIN 11 Oct 11:40-06:20+1)",
+      "date": "2026-09-28",
+      "endDate": "2026-10-12",
+      "start": "",
+      "end": "",
+      "address": "",
+      "people": [
+        "p1",
+        "p2",
+        "p3",
+        "p4"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "excludedDates": []
+    },
+    {
+      "id": "e15",
+      "activity": "Walter's Drontal",
+      "date": "2026-10-15",
+      "endDate": "",
+      "start": "",
+      "end": "",
+      "address": "",
+      "people": [
+        "p5"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "excludedDates": []
+    },
+    {
+      "id": "e16",
+      "activity": "Chinese class @ 6 Ave",
+      "date": "2026-07-02",
+      "endDate": "",
+      "start": "09:15",
+      "end": "",
+      "address": "6 Avenue",
+      "people": [
+        "p1",
+        "p2",
+        "p4"
+      ],
+      "repeat": "weekly",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "weeklyDays": [
+        4
+      ],
+      "monthlyMode": "date",
+      "monthlyOrdinal": 1,
+      "monthlyWeekday": 0,
+      "excludedDates": []
+    },
+    {
+      "id": "e17",
+      "activity": "Walter's Drontal",
+      "date": "2027-01-15",
+      "endDate": "",
+      "start": "",
+      "end": "",
+      "address": "",
+      "people": [
+        "p5"
+      ],
+      "repeat": "monthly",
+      "repeatInterval": 3,
+      "repeatUntil": "",
+      "weeklyDays": [],
+      "monthlyMode": "date",
+      "monthlyOrdinal": 1,
+      "monthlyWeekday": 0,
+      "excludedDates": []
+    }
+  ]
+}

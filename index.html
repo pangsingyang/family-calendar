@@ -503,6 +503,17 @@
     font-size:13px;
   }
   .note{font-size:12px; color:var(--ink-soft); margin-top:16px; line-height:1.5;}
+  .sync-summary{font-size:12.5px; color:var(--ink-soft); line-height:1.5;}
+  .sync-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-top:10px;
+  }
+  .sync-hint{font-size:11.5px; color:var(--ink-soft); margin-top:8px; line-height:1.5;}
+  @media(max-width:640px){
+    .sync-grid{grid-template-columns:1fr;}
+  }
   .export-toolbar{
     display:flex;
     justify-content:space-between;
@@ -558,6 +569,39 @@
       <input type="text" id="newPersonName" placeholder="Add a person, e.g. Grandma">
       <input type="color" id="newPersonColor" value="#3E7EA6">
       <button class="btn btn-ghost btn-small" id="addPersonBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="manage-people">
+    <h3>Sync across devices <button class="btn btn-ghost btn-small" id="toggleSyncBtn">Set up</button></h3>
+    <div id="syncSummary" class="sync-summary">Everyone viewing this page already sees the shared calendar automatically. Connect below only if you want your own edits to save back for everyone.</div>
+    <div id="syncRow" style="display:none;">
+      <div class="sync-grid">
+        <div class="field">
+          <label>GitHub username / org</label>
+          <input type="text" id="syncOwner" placeholder="e.g. sing">
+        </div>
+        <div class="field">
+          <label>Repository name</label>
+          <input type="text" id="syncRepo" placeholder="e.g. family-calendar">
+        </div>
+        <div class="field">
+          <label>Branch</label>
+          <input type="text" id="syncBranch" placeholder="main">
+        </div>
+        <div class="field">
+          <label>Personal access token</label>
+          <input type="password" id="syncToken" placeholder="github_pat_...">
+        </div>
+      </div>
+      <div class="sync-hint">Create a <strong>fine-grained</strong> token at github.com &rarr; Settings &rarr; Developer settings, scoped to only this repository, with "Contents: Read and write" permission. It's stored only in this browser and sent directly to GitHub — never anywhere else.</div>
+      <div class="modal-actions" style="margin-top:10px;">
+        <span class="export-hint" id="syncStatus"></span>
+        <div class="right">
+          <button class="btn btn-ghost btn-small" id="syncNowBtn">Sync now</button>
+          <button class="btn btn-primary btn-small" id="saveSyncBtn">Save connection</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -742,7 +786,7 @@
     calYear: new Date().getFullYear()
   };
 
-  function load(){
+  function loadLocal(){
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
       if(raw){
@@ -752,10 +796,95 @@
       }
     }catch(e){ /* storage unavailable in this environment; using in-memory defaults */ }
   }
-  function save(){
+  function cacheLocally(){
     try{
       localStorage.setItem(STORAGE_KEY, JSON.stringify({people:state.people, events:state.events}));
     }catch(e){ /* ignore if storage blocked */ }
+  }
+  function save(){
+    cacheLocally();
+    scheduleGithubPush();
+  }
+
+  // ---------- GITHUB SYNC ----------
+  // Two halves: (1) reading calendar-data.json, which sits alongside index.html and
+  // is served by GitHub Pages same-origin — works for every visitor, no setup needed.
+  // (2) writing back to that file via the GitHub API, which needs a personal access
+  // token — only people who add/edit events need to configure this in their own browser.
+  const GITHUB_CONFIG_KEY = 'family-planner-github-config';
+  const DATA_FILE_DEFAULT = 'calendar-data.json';
+  let githubConfig = null;
+  try{ const raw = localStorage.getItem(GITHUB_CONFIG_KEY); githubConfig = raw ? JSON.parse(raw) : null; }catch(e){}
+
+  function githubConfigured(){
+    return !!(githubConfig && githubConfig.owner && githubConfig.repo && githubConfig.token);
+  }
+  function saveGithubConfig(cfg){
+    githubConfig = cfg;
+    try{ localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(cfg)); }catch(e){}
+  }
+  function utf8ToBase64(str){ return btoa(unescape(encodeURIComponent(str))); }
+
+  function setSyncStatus(text, isError){
+    const el = document.getElementById('syncStatus');
+    if(el){
+      el.textContent = text;
+      el.style.color = isError ? '#B23A2E' : 'var(--ink-soft)';
+    }
+  }
+
+  async function fetchSharedData(){
+    try{
+      const res = await fetch('./' + DATA_FILE_DEFAULT + '?t=' + Date.now(), {cache:'no-store'});
+      if(res.ok){
+        const data = await res.json();
+        if(data && Array.isArray(data.people) && Array.isArray(data.events)){
+          state.people = data.people;
+          state.events = data.events;
+          return true;
+        }
+      }
+    }catch(e){ /* offline, opened as a local file, or the shared file doesn't exist yet */ }
+    return false;
+  }
+
+  let pushDebounceTimer = null;
+  function scheduleGithubPush(){
+    if(!githubConfigured()) return;
+    clearTimeout(pushDebounceTimer);
+    setSyncStatus('Syncing…');
+    pushDebounceTimer = setTimeout(pushToGithub, 900);
+  }
+
+  async function pushToGithub(){
+    if(!githubConfigured()) return;
+    const {owner, repo, token} = githubConfig;
+    const branch = githubConfig.branch || 'main';
+    const path = githubConfig.path || DATA_FILE_DEFAULT;
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+    const content = utf8ToBase64(JSON.stringify({people:state.people, events:state.events}, null, 2));
+    try{
+      let sha = null;
+      const getRes = await fetch(`${apiUrl}?ref=${encodeURIComponent(branch)}`, {
+        headers: {Authorization:`Bearer ${token}`, Accept:'application/vnd.github+json'}
+      });
+      if(getRes.ok){ sha = (await getRes.json()).sha; }
+      const putRes = await fetch(apiUrl, {
+        method:'PUT',
+        headers: {Authorization:`Bearer ${token}`, Accept:'application/vnd.github+json', 'Content-Type':'application/json'},
+        body: JSON.stringify({ message:'Update family calendar data', content, sha: sha||undefined, branch })
+      });
+      if(putRes.ok){
+        setSyncStatus('Synced ' + new Date().toLocaleTimeString());
+      } else if(putRes.status===401){
+        setSyncStatus('Sync failed: token invalid or expired', true);
+      } else {
+        const err = await putRes.json().catch(()=>({}));
+        setSyncStatus('Sync failed: ' + (err.message || putRes.status), true);
+      }
+    }catch(e){
+      setSyncStatus('Sync failed: network error', true);
+    }
   }
 
   function uid(){ return 'e'+Math.random().toString(36).slice(2,10); }
@@ -955,6 +1084,48 @@
     const nextColor = PALETTE.find(c=>!state.people.some(p=>p.color===c)) || PALETTE[state.people.length % PALETTE.length];
     colorInput.value = nextColor;
     save(); renderAll();
+  });
+
+  // ---------- SYNC SETTINGS ----------
+  function populateSyncFields(){
+    document.getElementById('syncOwner').value = githubConfig ? (githubConfig.owner||'') : '';
+    document.getElementById('syncRepo').value = githubConfig ? (githubConfig.repo||'') : '';
+    document.getElementById('syncBranch').value = githubConfig ? (githubConfig.branch||'main') : 'main';
+    document.getElementById('syncToken').value = githubConfig ? (githubConfig.token||'') : '';
+    if(githubConfigured()){
+      setSyncStatus('Connected as sync source for ' + githubConfig.owner + '/' + githubConfig.repo);
+    }
+  }
+  document.getElementById('toggleSyncBtn').addEventListener('click', ()=>{
+    const row = document.getElementById('syncRow');
+    const opening = row.style.display === 'none';
+    row.style.display = opening ? 'block' : 'none';
+    document.getElementById('toggleSyncBtn').textContent = opening ? 'Close' : 'Set up';
+    if(opening) populateSyncFields();
+  });
+  document.getElementById('saveSyncBtn').addEventListener('click', ()=>{
+    const owner = document.getElementById('syncOwner').value.trim();
+    const repo = document.getElementById('syncRepo').value.trim();
+    const branch = document.getElementById('syncBranch').value.trim() || 'main';
+    const token = document.getElementById('syncToken').value.trim();
+    if(!owner || !repo || !token){
+      setSyncStatus('Please fill in username, repo, and token.', true);
+      return;
+    }
+    saveGithubConfig({owner, repo, branch, token, path: DATA_FILE_DEFAULT});
+    setSyncStatus('Connection saved. Syncing…');
+    pushToGithub();
+  });
+  document.getElementById('syncNowBtn').addEventListener('click', async ()=>{
+    setSyncStatus('Refreshing from GitHub…');
+    const got = await fetchSharedData();
+    if(got){
+      cacheLocally();
+      renderAll();
+      setSyncStatus('Refreshed ' + new Date().toLocaleTimeString());
+    } else {
+      setSyncStatus('Could not find a shared calendar-data.json yet. Add or edit an event once connected to create it.', true);
+    }
   });
 
   // ---------- FILTERS ----------
@@ -1443,8 +1614,18 @@
     if(state.view==='export') renderExport();
   }
 
-  load();
+  loadLocal();
+  if(githubConfigured()){
+    document.getElementById('syncSummary').textContent = `Connected — your edits sync to ${githubConfig.owner}/${githubConfig.repo} automatically.`;
+  }
   renderAll();
+  (async ()=>{
+    const gotShared = await fetchSharedData();
+    if(gotShared){
+      cacheLocally();
+      renderAll();
+    }
+  })();
 })();
 </script>
 </body>
