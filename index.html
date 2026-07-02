@@ -346,15 +346,6 @@
     padding-left:4px;
     font-weight:600;
   }
-  /* DAY PANEL */
-  .day-panel{
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:16px 18px;
-    margin-top:18px;
-  }
-  .day-panel h3{margin:0 0 10px; font-size:17px; color:var(--pine-dark);}
   /* MODAL */
   .overlay{
     position:fixed; inset:0;
@@ -603,7 +594,6 @@
       <div style="width:120px;"></div>
     </div>
     <div class="cal-grid" id="calGrid"></div>
-    <div class="day-panel" id="dayPanel" style="display:none;"></div>
   </div>
 
   <p class="note">Data is stored in this browser only, using localStorage. Once you host this file (e.g. GitHub Pages), each visitor's browser keeps its own copy. In this in-chat preview, storage may reset between reloads. The list view shows repeating events up to a year ahead; the calendar view always shows the full month you're viewing.</p>
@@ -749,8 +739,7 @@
     activeFilters: new Set(),
     view: 'list',
     calMonth: new Date().getMonth(),
-    calYear: new Date().getFullYear(),
-    selectedDay: null
+    calYear: new Date().getFullYear()
   };
 
   function load(){
@@ -969,6 +958,7 @@
   });
 
   // ---------- FILTERS ----------
+  let filterClickLock = false;
   function renderFilters(){
     const bar = document.getElementById('filterBar');
     bar.innerHTML = '<span class="label">Show</span>';
@@ -977,7 +967,14 @@
     allChip.style.background = state.activeFilters.size===0 ? 'var(--pine)' : '#fff';
     allChip.style.color = state.activeFilters.size===0 ? '#fff' : 'var(--ink-soft)';
     allChip.textContent = 'Everyone';
-    allChip.addEventListener('click', ()=>{ state.activeFilters.clear(); save(); renderAll(); });
+    allChip.addEventListener('click', ()=>{
+      if(filterClickLock) return;
+      filterClickLock = true;
+      state.activeFilters.clear();
+      save();
+      renderAll();
+      setTimeout(()=>{ filterClickLock = false; }, 350);
+    });
     bar.appendChild(allChip);
 
     state.people.forEach(p=>{
@@ -987,9 +984,12 @@
       if(on) chip.style.background = p.color;
       chip.innerHTML = `<span class="dot" style="background:${on?'#fff':p.color};"></span>${p.name}`;
       chip.addEventListener('click', ()=>{
+        if(filterClickLock) return;
+        filterClickLock = true;
         if(state.activeFilters.has(p.id)) state.activeFilters.delete(p.id);
         else state.activeFilters.add(p.id);
         renderAll();
+        setTimeout(()=>{ filterClickLock = false; }, 350);
       });
       bar.appendChild(chip);
     });
@@ -1197,60 +1197,26 @@
           cell.appendChild(more);
         }
         cell.addEventListener('click', ()=>{
-          state.selectedDay = c.dateStr;
-          renderDayPanel();
+          openModal(null, c.dateStr);
         });
       } else {
         cell.style.cursor='default';
       }
       grid.appendChild(cell);
     });
-
-    renderDayPanel();
-  }
-
-  function renderDayPanel(){
-    const panel = document.getElementById('dayPanel');
-    if(!state.selectedDay){ panel.style.display='none'; return; }
-    panel.style.display='block';
-    const d = fmtDate(state.selectedDay);
-    const dayEntries = [];
-    state.events.filter(passesFilter).forEach(ev=>{
-      getOccurrences(ev, state.selectedDay, state.selectedDay).forEach(occ=>{
-        dayEntries.push({ev, occStart:occ.start, occEnd:occ.end});
-      });
-    });
-    dayEntries.sort((a,b)=>(a.ev.start||'').localeCompare(b.ev.start||''));
-    panel.innerHTML = `<h3>${d.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'})}</h3>`;
-    if(dayEntries.length===0){
-      panel.innerHTML += `<div class="empty-state" style="padding:30px;">Nothing scheduled. <button class="btn btn-primary btn-small" id="quickAdd">+ Add event</button></div>`;
-    } else {
-      dayEntries.forEach(entry=>panel.appendChild(renderEventCard(entry.ev, entry.occStart, entry.occEnd)));
-      const addBtn = document.createElement('button');
-      addBtn.className='btn btn-ghost btn-small';
-      addBtn.textContent = '+ Add another event this day';
-      addBtn.style.marginTop='6px';
-      addBtn.addEventListener('click', ()=>openModal(null, state.selectedDay));
-      panel.appendChild(addBtn);
-    }
-    const quick = document.getElementById('quickAdd');
-    if(quick) quick.addEventListener('click', ()=>openModal(null, state.selectedDay));
   }
 
   document.getElementById('prevMonth').addEventListener('click', ()=>{
     state.calMonth--; if(state.calMonth<0){state.calMonth=11; state.calYear--;}
-    state.selectedDay=null;
     renderCalendar();
   });
   document.getElementById('nextMonth').addEventListener('click', ()=>{
     state.calMonth++; if(state.calMonth>11){state.calMonth=0; state.calYear++;}
-    state.selectedDay=null;
     renderCalendar();
   });
   document.getElementById('todayBtn').addEventListener('click', ()=>{
     const now = new Date();
     state.calMonth = now.getMonth(); state.calYear = now.getFullYear();
-    state.selectedDay = toLocalISO(now);
     renderCalendar();
   });
 
@@ -1410,7 +1376,7 @@
     return {weekday, ordinal: isLast ? -1 : Math.ceil(dayNum/7)};
   }
 
-  document.getElementById('addEventBtn').addEventListener('click', ()=>openModal(null, state.view==='calendar'?state.selectedDay:null));
+  document.getElementById('addEventBtn').addEventListener('click', ()=>openModal(null, null));
   document.getElementById('cancelBtn').addEventListener('click', closeModal);
   overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
 
