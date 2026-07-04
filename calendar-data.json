@@ -57,6 +57,7 @@
       "end": "",
       "address": "Goodman Arts Centre",
       "people": [
+        "p1",
         "p2",
         "p3",
         "p4"
@@ -64,7 +65,13 @@
       "repeat": "none",
       "repeatInterval": 1,
       "repeatUntil": "",
-      "excludedDates": []
+      "excludedDates": [],
+      "weeklyDays": [
+        0
+      ],
+      "monthlyMode": "date",
+      "monthlyOrdinal": 1,
+      "monthlyWeekday": 0
     },
     {
       "id": "e3",
