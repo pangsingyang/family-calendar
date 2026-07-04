@@ -348,6 +348,26 @@
       "monthlyOrdinal": 1,
       "monthlyWeekday": 6,
       "excludedDates": []
+    },
+    {
+      "id": "eytjcg3c1",
+      "activity": "swim",
+      "date": "2026-07-14",
+      "endDate": "",
+      "start": "10:24",
+      "end": "",
+      "address": "",
+      "people": [],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "weeklyDays": [
+        2
+      ],
+      "monthlyMode": "date",
+      "monthlyOrdinal": 2,
+      "monthlyWeekday": 2,
+      "excludedDates": []
     }
   ]
 }
