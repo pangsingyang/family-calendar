@@ -149,19 +149,12 @@
       "end": "",
       "address": "",
       "people": [
-        "p5",
-        "exioni6ur"
+        "p5"
       ],
       "repeat": "none",
       "repeatInterval": 1,
       "repeatUntil": "",
-      "excludedDates": [],
-      "weeklyDays": [
-        3
-      ],
-      "monthlyMode": "date",
-      "monthlyOrdinal": 3,
-      "monthlyWeekday": 3
+      "excludedDates": []
     },
     {
       "id": "e8",
