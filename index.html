@@ -347,6 +347,24 @@
     padding-left:4px;
     font-weight:600;
   }
+  .day-panel{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+    margin-top:18px;
+  }
+  .day-panel h3{margin:0 0 10px; font-size:17px; color:var(--pine-dark);}
+  .modal-wide{max-width:560px;}
+  .day-modal-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:16px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--line);
+  }
+  .day-modal-header h3{margin:0; font-size:17px; color:var(--pine-dark); text-align:center; flex:1;}
   /* MODAL */
   .overlay{
     position:fixed; inset:0;
@@ -676,6 +694,17 @@
   <p class="note">Data is stored in this browser only, using localStorage. Once you host this file (e.g. GitHub Pages), each visitor's browser keeps its own copy. In this in-chat preview, storage may reset between reloads. The list view shows repeating events up to a year ahead; the calendar view always shows the full month you're viewing.</p>
 </div>
 
+<div class="overlay" id="dayOverlay">
+  <div class="modal modal-wide">
+    <div class="day-modal-header">
+      <button class="btn btn-ghost btn-small" id="dayBackBtn">&larr; Back</button>
+      <h3 id="dayPanelTitle"></h3>
+      <span style="width:64px;"></span>
+    </div>
+    <div id="dayPanelBody"></div>
+  </div>
+</div>
+
 <div class="overlay" id="overlay">
   <div class="modal">
     <h2 id="modalTitle">Add event</h2>
@@ -816,7 +845,8 @@
     activeFilters: new Set(),
     view: 'list',
     calMonth: new Date().getMonth(),
-    calYear: new Date().getFullYear()
+    calYear: new Date().getFullYear(),
+    selectedDay: null
   };
 
   function loadLocal(){
@@ -1451,26 +1481,71 @@
           cell.appendChild(more);
         }
         cell.addEventListener('click', ()=>{
-          openModal(null, c.dateStr);
+          state.selectedDay = c.dateStr;
+          renderDayPanel();
         });
       } else {
         cell.style.cursor='default';
       }
       grid.appendChild(cell);
     });
+
+    renderDayPanel();
   }
+
+  function renderDayPanel(){
+    if(!state.selectedDay) return;
+    const d = fmtDate(state.selectedDay);
+    const dayEntries = [];
+    state.events.filter(passesFilter).forEach(ev=>{
+      getOccurrences(ev, state.selectedDay, state.selectedDay).forEach(occ=>{
+        if(occ.start <= state.selectedDay && occ.end >= state.selectedDay){
+          dayEntries.push({ev, occStart:occ.start, occEnd:occ.end});
+        }
+      });
+    });
+    dayEntries.sort((a,b)=>(a.ev.start||'').localeCompare(b.ev.start||''));
+    document.getElementById('dayPanelTitle').textContent = d.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'});
+    const body = document.getElementById('dayPanelBody');
+    body.innerHTML = '';
+    if(dayEntries.length===0){
+      body.innerHTML = `<div class="empty-state" style="padding:30px;">Nothing scheduled. <button class="btn btn-primary btn-small" id="quickAdd">+ Add event</button></div>`;
+    } else {
+      dayEntries.forEach(entry=>body.appendChild(renderEventCard(entry.ev, entry.occStart, entry.occEnd)));
+      const addBtn = document.createElement('button');
+      addBtn.className='btn btn-ghost btn-small';
+      addBtn.textContent = '+ Add another event this day';
+      addBtn.style.marginTop='6px';
+      addBtn.addEventListener('click', ()=>openModal(null, state.selectedDay));
+      body.appendChild(addBtn);
+    }
+    const quick = document.getElementById('quickAdd');
+    if(quick) quick.addEventListener('click', ()=>openModal(null, state.selectedDay));
+    document.getElementById('dayOverlay').classList.add('show');
+  }
+  function closeDayPanel(){
+    document.getElementById('dayOverlay').classList.remove('show');
+    state.selectedDay = null;
+  }
+  document.getElementById('dayBackBtn').addEventListener('click', closeDayPanel);
+  document.getElementById('dayOverlay').addEventListener('click', e=>{
+    if(e.target.id === 'dayOverlay') closeDayPanel();
+  });
 
   document.getElementById('prevMonth').addEventListener('click', ()=>{
     state.calMonth--; if(state.calMonth<0){state.calMonth=11; state.calYear--;}
+    closeDayPanel();
     renderCalendar();
   });
   document.getElementById('nextMonth').addEventListener('click', ()=>{
     state.calMonth++; if(state.calMonth>11){state.calMonth=0; state.calYear++;}
+    closeDayPanel();
     renderCalendar();
   });
   document.getElementById('todayBtn').addEventListener('click', ()=>{
     const now = new Date();
     state.calMonth = now.getMonth(); state.calYear = now.getFullYear();
+    state.selectedDay = toLocalISO(now);
     renderCalendar();
   });
 
@@ -1632,7 +1707,7 @@
     return {weekday, ordinal: isLast ? -1 : Math.ceil(dayNum/7)};
   }
 
-  document.getElementById('addEventBtn').addEventListener('click', ()=>openModal(null, null));
+  document.getElementById('addEventBtn').addEventListener('click', ()=>openModal(null, state.view==='calendar'?state.selectedDay:null));
   document.getElementById('cancelBtn').addEventListener('click', closeModal);
   overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
 
