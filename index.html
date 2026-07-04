@@ -934,14 +934,33 @@
   }
 
   let pushDebounceTimer = null;
+  let pushInFlight = false;
+  let pushQueuedAgain = false;
   function scheduleGithubPush(){
     if(!githubConfigured()) return;
     clearTimeout(pushDebounceTimer);
     setSyncStatus('Syncing…');
-    pushDebounceTimer = setTimeout(pushToGithub, 900);
+    pushDebounceTimer = setTimeout(runGithubPush, 900);
+  }
+  async function runGithubPush(){
+    if(pushInFlight){
+      // A push is already in progress; make sure we run once more after it
+      // finishes so this newer save isn't lost, instead of firing a second
+      // request in parallel (which is what caused sha-conflict errors).
+      pushQueuedAgain = true;
+      return;
+    }
+    pushInFlight = true;
+    await pushToGithub();
+    pushInFlight = false;
+    if(pushQueuedAgain){
+      pushQueuedAgain = false;
+      runGithubPush();
+    }
   }
 
-  async function pushToGithub(){
+  async function pushToGithub(retryCount){
+    retryCount = retryCount || 0;
     if(!githubConfigured()) return;
     const {owner, repo, token} = githubConfig;
     const branch = githubConfig.branch || 'main';
@@ -951,6 +970,7 @@
     try{
       let sha = null;
       const getRes = await fetch(`${apiUrl}?ref=${encodeURIComponent(branch)}`, {
+        cache: 'no-store',
         headers: {Authorization:`Bearer ${token}`, Accept:'application/vnd.github+json'}
       });
       if(getRes.ok){ sha = (await getRes.json()).sha; }
@@ -963,6 +983,10 @@
         setSyncStatus('Synced ' + new Date().toLocaleTimeString());
       } else if(putRes.status===401){
         setSyncStatus('Sync failed: token invalid or expired', true);
+      } else if((putRes.status===409 || putRes.status===422) && retryCount < 2){
+        // The file changed on GitHub between our read and write (someone else
+        // saved, or our own sha was stale) — refetch the latest version and retry.
+        await pushToGithub(retryCount+1);
       } else {
         const err = await putRes.json().catch(()=>({}));
         setSyncStatus('Sync failed: ' + (err.message || putRes.status), true);
@@ -1221,7 +1245,7 @@
     }
     saveGithubConfig({owner, repo, branch, token, path: DATA_FILE_DEFAULT});
     setSyncStatus('Connection saved. Syncing…');
-    pushToGithub();
+    runGithubPush();
   });
   document.getElementById('syncNowBtn').addEventListener('click', async ()=>{
     setSyncStatus('Refreshing from GitHub…');
