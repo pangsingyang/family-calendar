@@ -18,7 +18,7 @@
     {
       "id": "p4",
       "name": "Grandma",
-      "color": "#cdc979"
+      "color": "#6A5A9E"
     },
     {
       "id": "p5",
@@ -149,12 +149,19 @@
       "end": "",
       "address": "",
       "people": [
-        "p5"
+        "p5",
+        "exioni6ur"
       ],
       "repeat": "none",
       "repeatInterval": 1,
       "repeatUntil": "",
-      "excludedDates": []
+      "excludedDates": [],
+      "weeklyDays": [
+        3
+      ],
+      "monthlyMode": "date",
+      "monthlyOrdinal": 3,
+      "monthlyWeekday": 3
     },
     {
       "id": "e8",
@@ -279,8 +286,7 @@
       "people": [
         "p1",
         "p2",
-        "p4",
-        "exioni6ur"
+        "p4"
       ],
       "repeat": "weekly",
       "repeatInterval": 1,
