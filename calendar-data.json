@@ -18,7 +18,7 @@
     {
       "id": "p4",
       "name": "Grandma",
-      "color": "#6A5A9E"
+      "color": "#cdc979"
     },
     {
       "id": "p5",
@@ -279,7 +279,8 @@
       "people": [
         "p1",
         "p2",
-        "p4"
+        "p4",
+        "exioni6ur"
       ],
       "repeat": "weekly",
       "repeatInterval": 1,
