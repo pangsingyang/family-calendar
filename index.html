@@ -324,6 +324,7 @@
     font-weight:700;
     color:var(--ink);
   }
+  .cal-ev-row{display:flex; flex-direction:column; gap:3px; min-width:0;}
   .cal-ev{
     font-size:10.5px;
     background:var(--bg);
@@ -555,10 +556,25 @@
   }
   .export-text:focus{outline:none;}
   @media(max-width:640px){
-    .cal-cell{min-height:64px;}
-    .cal-ev{display:none;}
+    .cal-cell{min-height:56px; padding:4px 3px; gap:2px;}
     .cal-cell .num{font-size:12px;}
     .event-people{max-width:120px;}
+    .cal-ev-row{flex-direction:row !important; flex-wrap:wrap; gap:3px !important;}
+    .cal-ev{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:7px; height:7px;
+      padding:0; margin:0;
+      border-radius:50%;
+      background:none !important;
+      overflow:visible;
+      gap:0;
+    }
+    .cal-ev .dot{width:100%; height:100%; margin:0;}
+    .cal-ev .dot:not(:first-child){display:none;}
+    .cal-ev .label{display:none;}
+    .cal-more{display:none;}
   }
 </style>
 </head>
@@ -1237,7 +1253,7 @@
   function renderList(){
     const el = document.getElementById('listView');
     const today = toLocalISO(new Date());
-    const rangeStart = addDays(today, -60);
+    const rangeStart = today;
     const rangeEnd = addDays(today, 365);
     let entries = [];
     state.events.filter(passesFilter).forEach(ev=>{
@@ -1245,6 +1261,7 @@
         entries.push({ev, occStart:occ.start, occEnd:occ.end});
       });
     });
+    entries = entries.filter(entry=>entry.occEnd >= today);
     if(entries.length===0){
       el.innerHTML = `<div class="empty-state"><h3>Nothing on the board yet</h3><p>Add an event to get the week going.</p></div>`;
       return;
@@ -1412,7 +1429,11 @@
       if(c.dateStr){
         const dayEntries = monthEntries.filter(en=> en.occStart<=c.dateStr && en.occEnd>=c.dateStr)
           .sort((a,b)=>(a.ev.start||'').localeCompare(b.ev.start||''));
-        dayEntries.slice(0,3).forEach(entry=>{
+        const isCompact = window.matchMedia('(max-width: 640px)').matches;
+        const maxShown = isCompact ? 6 : 3;
+        const evRow = document.createElement('div');
+        evRow.className = 'cal-ev-row';
+        dayEntries.slice(0,maxShown).forEach(entry=>{
           const ev = entry.ev;
           const dots = ev.people.map(pid=>{
             const p = personById(pid);
@@ -1420,13 +1441,14 @@
           }).join('');
           const tag = document.createElement('div');
           tag.className='cal-ev';
-          tag.innerHTML = `${dots || '<span class="dot" style="background:#999"></span>'}${escapeHtml(ev.activity)}`;
-          cell.appendChild(tag);
+          tag.innerHTML = `${dots || '<span class="dot" style="background:#999"></span>'}<span class="label">${escapeHtml(ev.activity)}</span>`;
+          evRow.appendChild(tag);
         });
-        if(dayEntries.length>3){
+        cell.appendChild(evRow);
+        if(dayEntries.length>maxShown){
           const more = document.createElement('div');
           more.className='cal-more';
-          more.textContent = `+${dayEntries.length-3} more`;
+          more.textContent = `+${dayEntries.length-maxShown} more`;
           cell.appendChild(more);
         }
         cell.addEventListener('click', ()=>{
@@ -1470,14 +1492,16 @@
   }
 
   function buildExportText(){
-    const rangeStart = addDays(toLocalISO(new Date()), -60);
-    const rangeEnd = addDays(toLocalISO(new Date()), 365);
+    const today = toLocalISO(new Date());
+    const rangeStart = today;
+    const rangeEnd = addDays(today, 365);
     let entries = [];
     state.events.filter(passesFilter).forEach(ev=>{
       getOccurrences(ev, rangeStart, rangeEnd).forEach(occ=>{
         entries.push({ev, occStart:occ.start, occEnd:occ.end});
       });
     });
+    entries = entries.filter(entry=>entry.occEnd >= today);
     entries.sort((a,b)=>{
       if(a.occStart!==b.occStart) return a.occStart<b.occStart?-1:1;
       return (a.ev.start||'').localeCompare(b.ev.start||'');
