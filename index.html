@@ -605,9 +605,13 @@
         </div>
         <div class="field">
           <label>Personal access token</label>
-          <input type="password" id="syncToken" placeholder="github_pat_...">
+          <div style="display:flex; gap:6px;">
+            <input type="password" id="syncToken" placeholder="github_pat_..." autocomplete="off" style="flex:1;">
+            <button type="button" class="btn btn-ghost btn-small" id="toggleTokenVisibility">Show</button>
+          </div>
         </div>
       </div>
+      <div class="sync-hint" id="tokenLengthHint" style="display:none;"></div>
       <div class="sync-hint">Create a <strong>fine-grained</strong> token at github.com &rarr; Settings &rarr; Developer settings, scoped to only this repository, with "Contents: Read and write" permission. It's stored only in this browser and sent directly to GitHub — never anywhere else.</div>
       <div class="modal-actions" style="margin-top:10px;">
         <span class="export-hint" id="syncStatus"></span>
@@ -1128,10 +1132,32 @@
     document.getElementById('syncRepo').value = githubConfig ? (githubConfig.repo||'') : '';
     document.getElementById('syncBranch').value = githubConfig ? (githubConfig.branch||'main') : 'main';
     document.getElementById('syncToken').value = githubConfig ? (githubConfig.token||'') : '';
+    checkTokenShape();
     if(githubConfigured()){
       setSyncStatus('Connected as sync source for ' + githubConfig.owner + '/' + githubConfig.repo);
     }
   }
+  document.getElementById('toggleTokenVisibility').addEventListener('click', ()=>{
+    const input = document.getElementById('syncToken');
+    const btn = document.getElementById('toggleTokenVisibility');
+    const showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+    btn.textContent = showing ? 'Show' : 'Hide';
+  });
+  function checkTokenShape(){
+    const token = document.getElementById('syncToken').value.trim();
+    const hint = document.getElementById('tokenLengthHint');
+    if(!token){ hint.style.display = 'none'; return; }
+    const looksRight = token.startsWith('github_pat_') && token.length > 60;
+    if(!looksRight){
+      hint.style.display = 'block';
+      hint.style.color = '#B23A2E';
+      hint.textContent = `This doesn't look like a complete fine-grained token (should start with "github_pat_" and be quite long — yours is ${token.length} characters). Click "Show" and check it pasted in full, with no extra spaces or line breaks.`;
+    } else {
+      hint.style.display = 'none';
+    }
+  }
+  document.getElementById('syncToken').addEventListener('input', checkTokenShape);
   document.getElementById('toggleSyncBtn').addEventListener('click', ()=>{
     const row = document.getElementById('syncRow');
     const opening = row.style.display === 'none';
