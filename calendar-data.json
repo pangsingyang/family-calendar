@@ -318,6 +318,29 @@
       "monthlyOrdinal": 2,
       "monthlyWeekday": 2,
       "excludedDates": []
+    },
+    {
+      "id": "einrjhxt0",
+      "activity": "Jurong Chinese Class",
+      "date": "2026-07-15",
+      "endDate": "",
+      "start": "15:00",
+      "end": "",
+      "address": "",
+      "people": [
+        "p2",
+        "p4"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "weeklyDays": [
+        3
+      ],
+      "monthlyMode": "date",
+      "monthlyOrdinal": 3,
+      "monthlyWeekday": 3,
+      "excludedDates": []
     }
   ]
 }
