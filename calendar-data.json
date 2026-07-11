@@ -308,7 +308,7 @@
         "p2",
         "exioni6ur"
       ],
-      "repeat": "none",
+      "repeat": "weekly",
       "repeatInterval": 1,
       "repeatUntil": "",
       "weeklyDays": [
