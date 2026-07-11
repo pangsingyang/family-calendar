@@ -294,6 +294,30 @@
       "monthlyOrdinal": 1,
       "monthlyWeekday": 0,
       "excludedDates": []
+    },
+    {
+      "id": "e74uuitf2",
+      "activity": "6 ave Chinese Class",
+      "date": "2026-07-14",
+      "endDate": "",
+      "start": "09:15",
+      "end": "",
+      "address": "",
+      "people": [
+        "p1",
+        "p2",
+        "exioni6ur"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "weeklyDays": [
+        2
+      ],
+      "monthlyMode": "date",
+      "monthlyOrdinal": 2,
+      "monthlyWeekday": 2,
+      "excludedDates": []
     }
   ]
 }
