@@ -318,26 +318,6 @@
       "monthlyOrdinal": 1,
       "monthlyWeekday": 0,
       "excludedDates": []
-    },
-    {
-      "id": "el7hcme64",
-      "activity": "Test swim class",
-      "date": "2026-07-12",
-      "endDate": "",
-      "start": "09:30",
-      "end": "",
-      "address": "Coronation road",
-      "people": [],
-      "repeat": "none",
-      "repeatInterval": 1,
-      "repeatUntil": "",
-      "weeklyDays": [
-        6
-      ],
-      "monthlyMode": "date",
-      "monthlyOrdinal": 1,
-      "monthlyWeekday": 6,
-      "excludedDates": []
     }
   ]
 }
