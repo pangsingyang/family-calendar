@@ -338,28 +338,6 @@
       "monthlyOrdinal": 1,
       "monthlyWeekday": 6,
       "excludedDates": []
-    },
-    {
-      "id": "edpgvfqsu",
-      "activity": "swim test",
-      "date": "2026-07-14",
-      "endDate": "",
-      "start": "09:23",
-      "end": "",
-      "address": "",
-      "people": [
-        "p2"
-      ],
-      "repeat": "none",
-      "repeatInterval": 1,
-      "repeatUntil": "",
-      "weeklyDays": [
-        6
-      ],
-      "monthlyMode": "date",
-      "monthlyOrdinal": 1,
-      "monthlyWeekday": 6,
-      "excludedDates": []
     }
   ]
 }
