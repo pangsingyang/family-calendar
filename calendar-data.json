@@ -341,6 +341,29 @@
       "monthlyOrdinal": 3,
       "monthlyWeekday": 3,
       "excludedDates": []
+    },
+    {
+      "id": "ezj6w9aey",
+      "activity": "Botanics Chinese Class",
+      "date": "2026-07-16",
+      "endDate": "",
+      "start": "09:30",
+      "end": "",
+      "address": "",
+      "people": [
+        "p2",
+        "p4"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "weeklyDays": [
+        4
+      ],
+      "monthlyMode": "date",
+      "monthlyOrdinal": 3,
+      "monthlyWeekday": 4,
+      "excludedDates": []
     }
   ]
 }
