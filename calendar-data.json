@@ -364,6 +364,29 @@
       "monthlyOrdinal": 3,
       "monthlyWeekday": 4,
       "excludedDates": []
+    },
+    {
+      "id": "ebt12xrte",
+      "activity": "walter grooming",
+      "date": "2026-07-15",
+      "endDate": "",
+      "start": "14:00",
+      "end": "",
+      "address": "sunset grooming",
+      "people": [
+        "p5",
+        "exioni6ur"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "weeklyDays": [
+        3
+      ],
+      "monthlyMode": "date",
+      "monthlyOrdinal": 3,
+      "monthlyWeekday": 3,
+      "excludedDates": []
     }
   ]
 }
