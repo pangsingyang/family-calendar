@@ -276,30 +276,6 @@
       "excludedDates": []
     },
     {
-      "id": "e16",
-      "activity": "Chinese class @ 6 Ave",
-      "date": "2026-07-02",
-      "endDate": "",
-      "start": "09:15",
-      "end": "",
-      "address": "6 Avenue",
-      "people": [
-        "p1",
-        "p2",
-        "p4"
-      ],
-      "repeat": "weekly",
-      "repeatInterval": 1,
-      "repeatUntil": "",
-      "weeklyDays": [
-        4
-      ],
-      "monthlyMode": "date",
-      "monthlyOrdinal": 1,
-      "monthlyWeekday": 0,
-      "excludedDates": []
-    },
-    {
       "id": "e17",
       "activity": "Walter's Drontal",
       "date": "2027-01-15",
