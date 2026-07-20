@@ -331,7 +331,7 @@
         "p2",
         "p4"
       ],
-      "repeat": "none",
+      "repeat": "weekly",
       "repeatInterval": 1,
       "repeatUntil": "",
       "weeklyDays": [
