@@ -409,6 +409,28 @@
       "monthlyOrdinal": -1,
       "monthlyWeekday": 2,
       "excludedDates": []
+    },
+    {
+      "id": "ecazg23rc",
+      "activity": "Sharon Gym",
+      "date": "2026-07-31",
+      "endDate": "",
+      "start": "08:00",
+      "end": "",
+      "address": "",
+      "people": [
+        "p4"
+      ],
+      "repeat": "weekly",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "weeklyDays": [
+        5
+      ],
+      "monthlyMode": "date",
+      "monthlyOrdinal": -1,
+      "monthlyWeekday": 5,
+      "excludedDates": []
     }
   ]
 }
