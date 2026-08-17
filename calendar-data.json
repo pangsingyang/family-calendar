@@ -431,6 +431,32 @@
       "monthlyOrdinal": -1,
       "monthlyWeekday": 5,
       "excludedDates": []
+    },
+    {
+      "id": "euspww73a",
+      "activity": "yeye boat - morning/evening TBD",
+      "date": "2026-08-23",
+      "endDate": "",
+      "start": "",
+      "end": "",
+      "address": "",
+      "people": [
+        "p1",
+        "p2",
+        "p3",
+        "p5",
+        "exioni6ur"
+      ],
+      "repeat": "none",
+      "repeatInterval": 1,
+      "repeatUntil": "",
+      "weeklyDays": [
+        0
+      ],
+      "monthlyMode": "date",
+      "monthlyOrdinal": 4,
+      "monthlyWeekday": 0,
+      "excludedDates": []
     }
   ]
 }
